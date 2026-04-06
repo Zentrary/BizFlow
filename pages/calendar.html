@@ -275,7 +275,11 @@
                             >
                                 {{ cat }}
                             </button>
-                        </div>
+                                            </div>
+
+                    <div class="mb-4" v-if="showCustomCategoryInput">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">หมวดหมู่อื่นๆ</label>
+                        <input v-model="form.customCategory" type="text" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="เช่น ค่ากาแฟ, ค่าเดินทางพิเศษ">
                     </div>
 
                     <!-- Amount -->
@@ -293,21 +297,6 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">วันที่</label>
                             <input v-model="form.date" type="date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        </div>
-                    </div>
-
-                    <!-- Method -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">ช่องทางการเงิน</label>
-                        <div class="flex gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer dark:text-gray-300">
-                                <input type="radio" v-model="form.method" value="cash" class="w-4 h-4 text-indigo-600">
-                                <span>เงินสด</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer dark:text-gray-300">
-                                <input type="radio" v-model="form.method" value="transfer" class="w-4 h-4 text-indigo-600">
-                                <span>โอนเงิน</span>
-                            </label>
                         </div>
                     </div>
 
@@ -356,7 +345,7 @@
                             </div>
                             <div>
                                 <p class="font-bold text-gray-800 text-sm dark:text-white">{{ t.title }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ t.category }} • {{ t.method === 'cash' ? 'เงินสด' : 'โอน' }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ t.category }}</p>
                             </div>
                         </div>
                         <span :class="t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'" class="font-bold text-sm shrink-0 w-24 text-right">
@@ -568,3 +557,4 @@
     <script type="module" src="../js/app.js"></script>
 </body>
 </html>
+
