@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/auth/(.*)", "destination": "/api/[...route]" },
     { "source": "/api/(.*)", "destination": "/api/[...route]" }
