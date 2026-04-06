@@ -1,0 +1,304 @@
+body { font-family: 'Sarabun', sans-serif; }
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* Custom Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+/* Utility Classes */
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulseGlow 2s infinite;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* Hover Effects */
+.hover-scale {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-scale:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Staggered List Animation */
+.stagger-enter-active, .stagger-leave-active {
+    transition: all 0.5s ease;
+}
+.stagger-enter-from, .stagger-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+[v-cloak] {
+    display: none !important;
+}
+
+/* Safe Area for Mobile */
+.pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+}
+
+/* Global Theme Switch Fade */
+@keyframes crossFadeToDark {
+    0% { background: rgba(255,255,255,0); }
+    40% { background: rgba(100,100,100,1); } /* Middle gray tone */
+    60% { background: rgba(0,0,0,1); }
+    100% { background: rgba(0,0,0,0); }
+}
+@keyframes crossFadeToLight {
+    0% { background: rgba(0,0,0,0); }
+    40% { background: rgba(100,100,100,1); } /* Middle gray tone */
+    60% { background: rgba(255,255,255,1); }
+    100% { background: rgba(255,255,255,0); }
+}
+html.theme-switching * { transition: none !important; }
+html.theme-switching::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+html.theme-crossfade-to-dark::before { animation: crossFadeToDark 500ms ease-in-out forwards; }
+html.theme-crossfade-to-light::before { animation: crossFadeToLight 500ms ease-in-out forwards; }
+html.theme-switching-hide #app { opacity: 0; }
+
+/* Dark mode contrast improvements */
+.dark .text-gray-400 { color: #d1d5db !important; }
+.dark .text-gray-500 { color: #e5e7eb !important; }
+.dark select, .dark input, .dark textarea { color: #e5e7eb; }
+
+/* Receipt paper sizes */
+.receipt-container-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.receipt-scaler {
+    transform-origin: top center;
+    transition: transform 0.2s ease;
+}
+
+.receipt-paper-a4 { 
+    width: 210mm; 
+    min-height: 297mm; 
+    margin: 0 auto; 
+    padding: 15mm 15mm;
+    color: #1f2937; 
+    font-size: 11px; /* Reduced from 12px */
+    line-height: 1.3;
+}
+.receipt-paper-a4-landscape { 
+    width: 297mm; 
+    min-height: 210mm; 
+    margin: 0 auto; 
+    padding: 15mm 15mm;
+    color: #1f2937;
+    font-size: 11px; /* Reduced from 12px */
+}
+.receipt-paper-small { 
+    width: 80mm; 
+    min-height: auto;
+    margin: 0 auto; 
+    padding: 5mm;
+    color: #1f2937;
+    font-size: 9px; /* Reduced from 10px */
+}
+.receipt-toolbar button { font-size: 0.875rem; }
+
+/* Typography adjustments for Receipt */
+.receipt-paper-a4 h2, .receipt-paper-a4-landscape h2 {
+    font-size: 14px !important; /* Reduced from 16px - Header Shop Name */
+    margin-bottom: 2px !important;
+}
+.receipt-paper-a4 .header-info, .receipt-paper-a4-landscape .header-info {
+    font-size: 10px !important; /* Address/Phone */
+}
+
+/* Middle Section - Increase size */
+.receipt-paper-a4 .text-lg, .receipt-paper-a4-landscape .text-lg {
+    font-size: 13px !important; /* Increased from 12px - Date Label/Customer Name */
+}
+.receipt-paper-a4 .text-xl, .receipt-paper-a4-landscape .text-xl {
+    font-size: 16px !important; /* Increased from 14px - Total Amount */
+}
+.receipt-paper-a4 .text-3xl, .receipt-paper-a4-landscape .text-3xl {
+    font-size: 14px !important; /* Header Name overrides */
+}
+
+/* Table Content - Increase size */
+.receipt-paper-a4 table th, .receipt-paper-a4-landscape table th {
+    font-size: 12px; /* Increased from 11px */
+    padding-top: 6px;
+    padding-bottom: 6px;
+    white-space: nowrap;
+}
+.receipt-paper-a4 table td, .receipt-paper-a4-landscape table td {
+    font-size: 12px; /* Content size */
+    padding-top: 6px;
+    padding-bottom: 6px;
+    white-space: nowrap;
+}
+
+/* Small receipt typography overrides */
+.receipt-paper-small h2 { font-size: 12px !important; }
+.receipt-paper-small .header-info { font-size: 9px !important; }
+.receipt-paper-small .text-lg { font-size: 11px !important; }
+.receipt-paper-small .text-xl { font-size: 13px !important; }
+.receipt-paper-small .text-3xl { font-size: 14px !important; }
+.receipt-paper-small table th, .receipt-paper-small table td {
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+/* Force light styling for receipt content regardless of dark mode */
+.receipt-paper-a4 *, .receipt-paper-a4-landscape *, .receipt-paper-small * {
+    color: inherit; 
+}
+.receipt-paper-a4 .text-gray-500, .receipt-paper-a4-landscape .text-gray-500, .receipt-paper-small .text-gray-500 {
+    color: #4b5563 !important; /* Darker gray for better contrast */
+}
+.receipt-paper-a4 .text-gray-400, .receipt-paper-a4-landscape .text-gray-400, .receipt-paper-small .text-gray-400 {
+    color: #6b7280 !important; 
+}
+.receipt-paper-a4 .text-red-600, .receipt-paper-a4-landscape .text-red-600, .receipt-paper-small .text-red-600 {
+    color: #dc2626 !important;
+}
+.receipt-paper-a4 .text-emerald-600, .receipt-paper-a4-landscape .text-emerald-600, .receipt-paper-small .text-emerald-600 {
+    color: #059669 !important;
+}
+.receipt-paper-a4 .text-emerald-700, .receipt-paper-a4-landscape .text-emerald-700, .receipt-paper-small .text-emerald-700 {
+    color: #047857 !important;
+}
+.receipt-paper-a4 .text-red-700, .receipt-paper-a4-landscape .text-red-700, .receipt-paper-small .text-red-700 {
+    color: #b91c1c !important;
+}
+.receipt-paper-a4 .border-emerald-500, .receipt-paper-a4-landscape .border-emerald-500, .receipt-paper-small .border-emerald-500 {
+    border-color: #10b981 !important;
+}
+.receipt-paper-a4 .border-red-500, .receipt-paper-a4-landscape .border-red-500, .receipt-paper-small .border-red-500 {
+    border-color: #ef4444 !important;
+}
+
+@media print {
+    @page { margin: 0; }
+    
+    /* Reset visibility for everything first */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Make the modal container visible, but we need to ensure it takes up the full page */
+    .fixed.inset-0, .fixed.inset-0 * {
+        visibility: visible;
+    }
+    
+    .fixed.inset-0 {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: white;
+        z-index: 9999;
+    }
+
+    /* Hide toolbar and other non-printable elements explicitly */
+    .receipt-toolbar, .print\:hidden { 
+        display: none !important; 
+    }
+    
+    /* Ensure the wrapper is visible and reset styles */
+    .receipt-container-wrapper { 
+        display: block !important; 
+        padding: 0 !important; 
+        margin: 0 !important;
+        overflow: visible !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Reset the scaler transformation */
+    .receipt-scaler { 
+        transform: none !important; 
+        margin: 0 !important; 
+        padding: 0 !important;
+        width: auto !important;
+    } 
+    
+    /* Force specific sizes for paper */
+    .receipt-paper-a4 { 
+        width: 210mm !important; 
+        min-height: 297mm !important;
+        margin: 0 auto !important; 
+        padding: 15mm !important;
+        box-shadow: none !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+    .receipt-paper-a4-landscape { 
+        width: 297mm !important; 
+        min-height: 210mm !important;
+        margin: 0 auto !important; 
+        padding: 15mm !important;
+        box-shadow: none !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        transform: rotate(0deg) !important;
+    }
+    .receipt-paper-small { 
+        width: 80mm !important; 
+        margin: 0 auto !important; 
+        box-shadow: none !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}

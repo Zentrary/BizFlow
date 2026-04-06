@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizFlow - ระบบจัดการเงินร้านค้า</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/config.js"></script>
+    
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        html{scroll-behavior:smooth}
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <div id="app" class="h-screen overflow-hidden relative">
+        
+        <div  class="h-full overflow-y-auto bg-white dark:bg-gray-900 transition-colors">
+            <!-- Navbar -->
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-md z-50 dark:bg-gray-900/80 animate-fade-in">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl font-bold text-gray-800 dark:text-white">BizFlow</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#features" class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 transition">คุณสมบัติ</a>
+                    <a href="#about" class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 transition">เกี่ยวกับเรา</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button @click="toggleDarkMode" class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition hover:rotate-12 transform duration-300">
+                        <i class="ph" :class="isDarkMode ? 'ph-sun' : 'ph-moon'"></i>
+                    </button>
+                    <a href="pages/login.html" class="px-5 py-2 text-indigo-600 font-medium hover:bg-indigo-50 rounded-lg transition dark:text-indigo-400 dark:hover:bg-indigo-900/30 text-center">เข้าสู่ระบบ</a>
+                    <a href="pages/register.html" class="px-5 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition dark:shadow-none text-center hover:scale-105 transform duration-200">สมัครสมาชิก</a>
+                </div>
+            </nav>
+
+            <!-- Hero Section -->
+            <header class="container mx-auto px-6 py-16 md:py-24 flex flex-col-reverse md:flex-row items-center gap-12">
+                <div class="md:w-1/2 space-y-6 animate-slide-up">
+                    <h1 class="text-4xl md:text-6xl font-bold text-gray-900 leading-[1.4] md:leading-[1.35] dark:text-white">
+                        จัดการเงินร้านค้า<br>
+                        <span class="text-indigo-600">เรื่องง่าย...แค่ปลายนิ้ว</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed delay-100 animate-slide-up" style="animation-fill-mode: both;">
+                        เว็บแอปพลิเคชันบริหารจัดการการเงินสำหรับธุรกิจ SME ครบจบในที่เดียว บันทึกรายรับ-รายจ่าย ดูรายงานผลประกอบการ และออกใบเสร็จได้ทันที รองรับทุกอุปกรณ์
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4 delay-200 animate-slide-up" style="animation-fill-mode: both;">
+                        <button @click="loginAsGuest" class="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-orange-200 transition transform hover:-translate-y-1 dark:shadow-none flex items-center justify-center gap-2 animate-pulse-glow hover:animate-none">
+                            <i class="ph ph-user"></i>
+                            ทดลองใช้งาน (Guest)
+                        </button>
+                        <a href="pages/register.html" class="px-8 py-4 bg-white border-2 border-indigo-100 text-indigo-600 hover:border-indigo-600 hover:bg-indigo-50 rounded-xl font-bold text-lg transition dark:bg-gray-800 dark:border-gray-700 dark:text-indigo-400 dark:hover:border-indigo-500 text-center flex items-center justify-center hover:scale-105 transform duration-200">
+                            เริ่มต้นใช้งานฟรี
+                        </a>
+                    </div>
+                    <p class="text-sm text-gray-400 dark:text-gray-500 delay-300 animate-slide-up" style="animation-fill-mode: both;">* โหมด Guest ข้อมูลจะไม่ถูกบันทึกลงฐานข้อมูล</p>
+                </div>
+                <div class="md:w-1/2 relative animate-fade-in delay-200" style="animation-fill-mode: both;">
+                    <div class="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+                    <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Dashboard Preview" class="relative rounded-2xl shadow-2xl border-4 border-white dark:border-gray-800 transform rotate-2 hover:rotate-0 transition duration-500 animate-float">
+                </div>
+            </header>
+
+            <!-- Features Section -->
+            <section id="features" class="py-20 bg-gray-50 dark:bg-gray-800/50">
+                <div class="container mx-auto px-6">
+                    <div class="text-center max-w-2xl mx-auto mb-16 animate-slide-up">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-4 dark:text-white">ฟีเจอร์ที่ช่วยให้ธุรกิจคุณเติบโต</h2>
+                        <p class="text-gray-600 dark:text-gray-400">เครื่องมือครบครันที่ออกแบบมาเพื่อเจ้าของธุรกิจขนาดเล็กโดยเฉพาะ ใช้งานง่าย ไม่ซับซ้อน</p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <!-- Feature 1 -->
+                        <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition dark:bg-gray-800 hover-scale animate-slide-up delay-100" style="animation-fill-mode: both;">
+                            <div class="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-2xl mb-6 dark:bg-indigo-900/30 dark:text-indigo-400">
+                                <i class="ph ph-chart-line-up"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3 dark:text-white">วิเคราะห์ผลประกอบการ</h3>
+                            <p class="text-gray-600 dark:text-gray-400">ดูกำไร-ขาดทุน และแนวโน้มการเงินผ่านกราฟที่เข้าใจง่าย ช่วยให้วางแผนธุรกิจได้แม่นยำ</p>
+                        </div>
+                        <!-- Feature 2 -->
+                        <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition dark:bg-gray-800 hover-scale animate-slide-up delay-200" style="animation-fill-mode: both;">
+                            <div class="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 text-2xl mb-6 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                <i class="ph ph-receipt"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3 dark:text-white">ออกใบเสร็จ/ใบแจ้งหนี้</h3>
+                            <p class="text-gray-600 dark:text-gray-400">สร้างเอกสารทางการเงินแบบมืออาชีพ พร้อมพิมพ์หรือส่งไฟล์ PDF ให้ลูกค้าได้ทันที</p>
+                        </div>
+                        <!-- Feature 3 -->
+                        <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition dark:bg-gray-800 hover-scale animate-slide-up delay-300" style="animation-fill-mode: both;">
+                            <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 text-2xl mb-6 dark:bg-orange-900/30 dark:text-orange-400">
+                                <i class="ph ph-users"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3 dark:text-white">จัดการหนี้สิน</h3>
+                            <p class="text-gray-600 dark:text-gray-400">บันทึกรายการติดหนี้และลูกหนี้ แจ้งเตือนเมื่อถึงกำหนดชำระ ไม่พลาดทุกยอดเงิน</p>
+                        </div>
+                        <!-- Feature 4 -->
+                        <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition dark:bg-gray-800 hover-scale animate-slide-up delay-400" style="animation-fill-mode: both;">
+                            <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-2xl mb-6 dark:bg-blue-900/30 dark:text-blue-400">
+                                <i class="ph ph-calendar-check"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3 dark:text-white">ปฏิทินการเงิน</h3>
+                            <p class="text-gray-600 dark:text-gray-400">ดูรายการรับ-จ่ายในรูปแบบปฏิทิน ช่วยให้เห็นภาพรวมกระแสเงินสดรายวัน</p>
+                        </div>
+                        <!-- Feature 5 -->
+                        <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition dark:bg-gray-800 hover-scale animate-slide-up delay-500" style="animation-fill-mode: both;">
+                            <div class="w-14 h-14 bg-pink-100 rounded-xl flex items-center justify-center text-pink-600 text-2xl mb-6 dark:bg-pink-900/30 dark:text-pink-400">
+                                <i class="ph ph-shield-check"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3 dark:text-white">ปลอดภัยและเป็นส่วนตัว</h3>
+                            <p class="text-gray-600 dark:text-gray-400">ข้อมูลของคุณจะถูกเก็บรักษาอย่างปลอดภัย แยกบัญชีผู้ใช้งานอย่างชัดเจน</p>
+                        </div>
+                        <!-- Feature 6 -->
+                        <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition dark:bg-gray-800 hover-scale animate-slide-up delay-500" style="animation-fill-mode: both;">
+                            <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 text-2xl mb-6 dark:bg-purple-900/30 dark:text-purple-400">
+                                <i class="ph ph-device-mobile"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3 dark:text-white">รองรับทุกอุปกรณ์</h3>
+                            <p class="text-gray-600 dark:text-gray-400">ใช้งานได้ลื่นไหลทั้งบนคอมพิวเตอร์ แท็บเล็ต และสมาร์ทโฟน สะดวกทุกที่ทุกเวลา</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About / CTA Section -->
+            <section id="about" class="py-20 container mx-auto px-6">
+                <div class="bg-indigo-600 rounded-3xl p-12 text-center text-white relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                    <div class="relative z-10">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-6">พร้อมยกระดับธุรกิจของคุณหรือยัง?</h2>
+                        <p class="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">เริ่มต้นใช้งานวันนี้ฟรี ไม่มีค่าใช้จ่ายแอบแฝง หรือทดลองใช้งานแบบ Guest ได้ทันที</p>
+                        <div class="flex flex-col sm:flex-row justify-center gap-4">
+                            <a href="pages/register.html" class="px-8 py-3 bg-white text-indigo-600 rounded-xl font-bold hover:bg-indigo-50 transition flex items-center justify-center">
+                                สมัครสมาชิกเลย
+                            </a>
+                            <button @click="loginAsGuest" class="px-8 py-3 bg-indigo-700 text-white border border-indigo-500 rounded-xl font-bold hover:bg-indigo-800 transition">
+                                ทดลองใช้งาน
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-16 text-center border-t border-gray-200 pt-8 dark:border-gray-700">
+                    <p class="text-gray-500 dark:text-gray-400 mb-2">พัฒนาโดย <span class="text-indigo-600 font-bold dark:text-indigo-400">SME Money Team</span></p>
+                    <p class="text-sm text-gray-400">© 2024 SME Money Manager. All rights reserved.</p>
+                </div>
+            </section>
+        </div>
+
+    </div>
+    <script type="module" src="js/app.js"></script>
+    <script>
+        (function() {
+            const headerHeight = 72;
+            document.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener('click', e => {
+                    const id = link.getAttribute('href').slice(1);
+                    const target = document.getElementById(id);
+                    if (target) {
+                        e.preventDefault();
+                        const top = target.getBoundingClientRect().top + window.scrollY - headerHeight;
+                        window.scrollTo({ top, behavior: 'smooth' });
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

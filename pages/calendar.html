@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizFlow - ปฏิทินการเงิน</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/config.js"></script>
+    
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <div id="app" class="h-screen overflow-hidden relative" v-cloak>
+        
+        <div  class="flex h-full overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col dark:bg-gray-800 dark:border-gray-700 transition-colors duration-200">
+            <div class="p-6 flex items-center gap-3">
+                <h1 class="text-xl font-bold text-gray-800 dark:text-white">BizFlow</h1>
+            </div>
+            
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-300">
+                    <i class="ph ph-squares-four text-xl"></i>
+                    <span>ภาพรวม (Dashboard)</span>
+                </a>
+                <a href="transactions.html" class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-300">
+                    <i class="ph ph-list-dashes text-xl"></i>
+                    <span>รายการธุรกรรม</span>
+                </a>
+                <a href="calendar.html" class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <i class="ph ph-calendar text-xl"></i>
+                    <span>ปฏิทินการเงิน</span>
+                </a>
+                <a href="debts.html" class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-300">
+                    <i class="ph ph-user-list text-xl"></i>
+                    <span>จัดการหนี้สิน</span>
+                </a>
+                <a href="settings.html" class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-300">
+                    <i class="ph ph-gear text-xl"></i>
+                    <span>การตั้งค่า</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700">
+                <button @click="showAddModal = true" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-medium shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 transition">
+                    <i class="ph ph-plus-circle text-xl"></i>
+                    บันทึกรายการ
+                </button>
+                <button @click="toggleDarkMode" class="w-full mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition" :class="isDarkMode ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                    <i class="ph" :class="isDarkMode ? 'ph-sun' : 'ph-moon'"></i>
+                    {{ isDarkMode ? 'โหมดสว่าง' : 'โหมดมืด' }}
+                </button>
+                <button @click="logout" class="w-full mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 transition">
+                    <i class="ph ph-sign-out"></i>
+                    ออกจากระบบ
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden">
+            <!-- Guest Banner -->
+            <div v-if="isGuest" class="bg-orange-500 text-white px-4 py-2 text-sm text-center font-medium shadow-md z-10">
+                คุณกำลังใช้งานในโหมดผู้เยี่ยมชม (Guest) ข้อมูลจะไม่ถูกบันทึกถาวร 
+                <button @click="logout" class="underline ml-2 hover:text-orange-100">สมัครสมาชิกเพื่อบันทึกข้อมูล</button>
+            </div>
+
+            <!-- Header (Mobile only) -->
+            <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center dark:bg-gray-800 dark:border-gray-700 transition-colors sticky top-0 z-30 shadow-sm">
+                <h1 class="font-bold text-lg text-gray-800 dark:text-white">BizFlow</h1>
+                <button @click="showAddModal = true" class="text-indigo-600 font-medium bg-indigo-50 px-3 py-1.5 rounded-lg dark:bg-indigo-900/30 dark:text-indigo-300">+ เพิ่มรายการ</button>
+            </header>
+
+            <!-- Scrollable Area -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
+                
+                <!-- View: Dashboard (Removed) -->
+
+                <!-- View: Transactions List (Removed) -->
+
+                <!-- View: Calendar -->
+                <div v-if="currentView === 'calendar'" class="space-y-6">
+                    <div class="flex justify-between items-center animate-fade-in">
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">ปฏิทินการเงิน</h2>
+                        <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white transition-colors">
+                            <button @click="prevMonth" class="p-1 hover:bg-gray-100 rounded-full transition dark:hover:bg-gray-700"><i class="ph ph-caret-left text-xl"></i></button>
+                            <span class="font-bold text-lg min-w-[150px] text-center">{{ calendarHeader }}</span>
+                            <button @click="nextMonth" class="p-1 hover:bg-gray-100 rounded-full transition dark:hover:bg-gray-700"><i class="ph ph-caret-right text-xl"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden dark:bg-gray-800 dark:border-gray-700 transition-colors animate-slide-up delay-100" style="animation-fill-mode: both;">
+                        <!-- Weekday Header -->
+                        <div class="grid grid-cols-7 bg-gray-50 border-b border-gray-200 dark:bg-gray-900/50 dark:border-gray-700">
+                            <div v-for="day in ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส']" class="py-3 text-center text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                {{ day }}
+                            </div>
+                        </div>
+                        
+                        <!-- Calendar Grid -->
+                        <div class="grid grid-cols-7 divide-x divide-gray-100 bg-gray-100 gap-[1px] border-b border-gray-200 dark:divide-gray-700 dark:bg-gray-700 dark:border-gray-700">
+                            <div v-for="(day, index) in calendarDays" :key="index" class="min-h-[120px] bg-white p-2 relative group hover:bg-gray-50 transition cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-700" @click="day.isCurrentMonth && selectDate(day.dateStr)">
+                                <template v-if="day.isCurrentMonth">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span :class="{'bg-indigo-600 text-white w-7 h-7 flex items-center justify-center rounded-full': day.isToday}" class="text-sm font-medium text-gray-700 block dark:text-gray-300">
+                                            {{ day.day }}
+                                        </span>
+                                        <div v-if="day.income > 0 || day.expense > 0" class="flex flex-col items-end text-[10px] font-bold gap-1">
+                                            <span v-if="day.income > 0" class="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded dark:bg-emerald-900/30 dark:text-emerald-400">+{{ formatCurrency(day.income) }}</span>
+                                            <span v-if="day.expense > 0" class="text-red-600 bg-red-50 px-1.5 py-0.5 rounded dark:bg-red-900/30 dark:text-red-400">-{{ formatCurrency(day.expense) }}</span>
+                                        </div>
+                                    </div>
+                                    <!-- Transaction dots -->
+                                    <div class="space-y-1 mt-2">
+                                        <div v-for="t in day.transactions.slice(0, 3)" :key="t.id" class="flex items-center gap-1">
+                                            <div :class="t.type === 'income' ? 'bg-emerald-500' : 'bg-red-500'" class="w-1.5 h-1.5 rounded-full"></div>
+                                            <span class="text-[10px] text-gray-500 truncate w-full dark:text-gray-400">{{ t.title }}</span>
+                                        </div>
+                                        <div v-if="day.transactions.length > 3" class="text-[10px] text-gray-400 pl-2.5">
+                                            +{{ day.transactions.length - 3 }} รายการ
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6 animate-fade-in">
+                        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-gray-800 dark:text-white">อันดับหมวดหมู่เดือนนี้</h3>
+                                <span class="text-xs text-gray-400 dark:text-gray-500">สูงสุด 5 อันดับ</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="rounded-xl border border-gray-200 dark:border-gray-700">
+                                    <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                                        <span class="font-bold text-red-600 dark:text-red-400">ค่าใช้จ่าย</span>
+                                    </div>
+                                    <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                                        <div v-for="(cat, idx) in topExpenseCats" :key="'ex-'+cat.name" class="px-4 py-2 flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold dark:bg-gray-700 dark:text-gray-300">{{ idx + 1 }}</span>
+                                                <span class="text-gray-700 dark:text-gray-300">{{ cat.name }}</span>
+                                            </div>
+                                            <span class="font-bold text-red-600 dark:text-red-400">{{ formatCurrency(cat.amount) }}</span>
+                                        </div>
+                                        <div v-if="topExpenseCats.length === 0" class="px-4 py-3 text-gray-400 dark:text-gray-500">ยังไม่มีข้อมูล</div>
+                                    </div>
+                                </div>
+                                <div class="rounded-xl border border-gray-200 dark:border-gray-700">
+                                    <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                                        <span class="font-bold text-emerald-600 dark:text-emerald-400">รายรับ</span>
+                                    </div>
+                                    <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                                        <div v-for="(cat, idx) in topIncomeCats" :key="'in-'+cat.name" class="px-4 py-2 flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold dark:bg-gray-700 dark:text-gray-300">{{ idx + 1 }}</span>
+                                                <span class="text-gray-700 dark:text-gray-300">{{ cat.name }}</span>
+                                            </div>
+                                            <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ formatCurrency(cat.amount) }}</span>
+                                        </div>
+                                        <div v-if="topIncomeCats.length === 0" class="px-4 py-3 text-gray-400 dark:text-gray-500">ยังไม่มีข้อมูล</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-gray-800 dark:text-white">รายการล่าสุดของเดือนนี้</h3>
+                                <span class="text-xs text-gray-400 dark:text-gray-500">สูงสุด 6 รายการ</span>
+                            </div>
+                            <div class="space-y-2">
+                                <div v-for="t in recentMonthTransactions" :key="t.id" class="flex items-center justify-between px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                                    <div class="flex items-center gap-3">
+                                        <div :class="t.type === 'income' ? 'bg-emerald-500' : (t.type === 'expense' ? 'bg-red-500' : 'bg-indigo-500')" class="w-2 h-2 rounded-full"></div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t.title }}</div>
+                                            <div class="text-xs text-gray-400 dark:text-gray-500">{{ t.date }} • {{ t.category || 'ทั่วไป' }}</div>
+                                        </div>
+                                    </div>
+                                    <div :class="t.type === 'income' ? 'text-emerald-600' : (t.type === 'expense' ? 'text-red-600' : 'text-indigo-600')" class="font-bold">
+                                        {{ t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '') }}{{ formatCurrency(t.amount) }}
+                                    </div>
+                                </div>
+                                <div v-if="recentMonthTransactions.length === 0" class="text-gray-400 dark:text-gray-500 px-3">ยังไม่มีข้อมูล</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center px-2 py-3 z-40 dark:bg-gray-800 dark:border-gray-700 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+            <a href="dashboard.html" class="flex flex-col items-center gap-1 w-1/5 text-gray-400 dark:text-gray-500">
+                <i class="ph ph-squares-four text-2xl"></i>
+                <span class="text-[10px] font-medium">ภาพรวม</span>
+            </a>
+            <a href="transactions.html" class="flex flex-col items-center gap-1 w-1/5 text-gray-400 dark:text-gray-500">
+                <i class="ph ph-list-dashes text-2xl"></i>
+                <span class="text-[10px] font-medium">รายการ</span>
+            </a>
+            <div class="w-1/5 flex justify-center relative">
+                <button @click="showAddModal = true" class="absolute -top-10 bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full shadow-lg shadow-indigo-200 flex items-center justify-center transition transform hover:scale-105 dark:shadow-none dark:bg-indigo-500 border-4 border-gray-50 dark:border-gray-900">
+                    <i class="ph ph-plus text-2xl font-bold"></i>
+                </button>
+            </div>
+            <a href="debts.html" class="flex flex-col items-center gap-1 w-1/5 text-gray-400 dark:text-gray-500">
+                <i class="ph ph-user-list text-2xl"></i>
+                <span class="text-[10px] font-medium">หนี้สิน</span>
+            </a>
+            <a href="settings.html" class="flex flex-col items-center gap-1 w-1/5 text-gray-400 dark:text-gray-500">
+                <i class="ph ph-gear text-2xl"></i>
+                <span class="text-[10px] font-medium">ตั้งค่า</span>
+            </a>
+        </nav>
+
+        <!-- Modal: Add Transaction -->
+        <div v-if="showAddModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm" @click.self="showAddModal = false">
+            <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all dark:bg-gray-800 animate-slide-up">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center dark:bg-gray-900/50 dark:border-gray-700">
+                    <h3 class="font-bold text-lg text-gray-800 dark:text-white">{{ modalTitle }}</h3>
+                    <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="ph ph-x text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-4">
+                    <!-- Type Selector -->
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <button @click="form.type = 'income'" :class="form.type === 'income' ? 'bg-emerald-100 border-emerald-500 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-500' : 'border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700 dark:text-gray-300'" class="py-3 border-2 rounded-xl font-bold transition flex flex-col items-center justify-center gap-1">
+                            <i class="ph ph-arrow-down-left text-xl"></i> รายรับ
+                        </button>
+                        <button @click="form.type = 'expense'" :class="form.type === 'expense' ? 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:border-red-500' : 'border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700 dark:text-gray-300'" class="py-3 border-2 rounded-xl font-bold transition flex flex-col items-center justify-center gap-1">
+                            <i class="ph ph-arrow-up-right text-xl"></i> รายจ่าย
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button @click="form.type = 'debt'" :class="form.type === 'debt' ? 'bg-orange-100 border-orange-500 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-500' : 'border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700 dark:text-gray-300'" class="py-2 border-2 rounded-xl text-sm font-bold transition flex items-center justify-center gap-1">
+                            <i class="ph ph-hand-coins text-lg"></i> ลูกหนี้ (คนติดเงินเรา)
+                        </button>
+                        <button @click="form.type = 'payable'" :class="form.type === 'payable' ? 'bg-purple-100 border-purple-500 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-500' : 'border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700 dark:text-gray-300'" class="py-2 border-2 rounded-xl text-sm font-bold transition flex items-center justify-center gap-1">
+                            <i class="ph ph-receipt text-lg"></i> เจ้าหนี้ (เราติดเงินเขา)
+                        </button>
+                    </div>
+
+                    <!-- Category Selector -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">หมวดหมู่</label>
+                        <div class="category-grid">
+                            <button 
+                                v-for="cat in categories[form.type]"    
+                                :key="cat"
+                                @click="form.category = cat"
+                                :class="form.category === cat ? 'bg-indigo-100 text-indigo-700 border-indigo-500 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'"
+                                class="px-3 py-1.5 rounded-lg border text-sm font-medium transition"
+                            >
+                                {{ cat }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Amount -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">จำนวนเงิน (บาท)</label>
+                        <input v-model="amountInput" type="text" inputmode="decimal" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-xl font-bold dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="0">
+                    </div>
+
+                    <!-- Title & Date -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">รายการ</label>
+                            <input v-model="form.title" type="text" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="เช่น ค่าข้าว, ขายของ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">วันที่</label>
+                            <input v-model="form.date" type="date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        </div>
+                    </div>
+
+                    <!-- Method -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">ช่องทางการเงิน</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer dark:text-gray-300">
+                                <input type="radio" v-model="form.method" value="cash" class="w-4 h-4 text-indigo-600">
+                                <span>เงินสด</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer dark:text-gray-300">
+                                <input type="radio" v-model="form.method" value="transfer" class="w-4 h-4 text-indigo-600">
+                                <span>โอนเงิน</span>
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <button @click="saveTransaction" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-bold shadow-lg shadow-indigo-200 mt-4 dark:shadow-none">
+                        {{ modalSubmitLabel }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Day Details -->
+        <div v-if="showDayDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm" @click.self="showDayDetailModal = false">
+            <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all h-[600px] flex flex-col dark:bg-gray-800">
+                <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white shrink-0">
+                    <div>
+                        <p class="text-indigo-100 text-sm">รายการประจำวันที่</p>
+                        <h3 class="font-bold text-xl">{{ formatDate(selectedDay.dateStr) }}</h3>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button @click="openDailyInvoice(selectedDay.dateStr, selectedDay.transactions)" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg">
+                            <i class="ph ph-printer"></i> พิมพ์รวม
+                        </button>
+                        <button @click="showDayDetailModal = false" class="text-indigo-200 hover:text-white">
+                            <i class="ph ph-x text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-indigo-50 border-b border-indigo-100 shrink-0 dark:bg-indigo-900/50 dark:border-indigo-800">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600 dark:text-gray-300">รายรับรวม</span>
+                        <span class="font-bold text-emerald-600 dark:text-emerald-400">+{{ formatCurrency(selectedDay.income) }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm mt-1">
+                        <span class="text-gray-600 dark:text-gray-300">รายจ่ายรวม</span>
+                        <span class="font-bold text-red-600 dark:text-red-400">-{{ formatCurrency(selectedDay.expense) }}</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div v-for="t in selectedDay.transactions" :key="t.id" class="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                             <div :class="t.type === 'income' ? 'bg-emerald-600 text-white ring-2 ring-white/20' : 'bg-red-600 text-white ring-2 ring-white/20'" class="w-8 h-8 rounded-full flex items-center justify-center shrink-0">
+                                <i :class="getCategoryIcon(t.category)" class="text-sm font-bold"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800 text-sm dark:text-white">{{ t.title }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ t.category }} • {{ t.method === 'cash' ? 'เงินสด' : 'โอน' }}</p>
+                            </div>
+                        </div>
+                        <span :class="t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'" class="font-bold text-sm shrink-0 w-24 text-right">
+                            {{ t.type === 'income' ? '+' : '-' }}{{ formatCurrency(t.amount) }}
+                        </span>
+                        <div class="flex items-center shrink-0">
+                            <button @click="openInvoice(t)" class="ml-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400" title="พิมพ์ใบเสร็จ">
+                                <i class="ph ph-printer text-lg"></i>
+                            </button>
+                            <button @click="startEditTransaction(t)" class="ml-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400" title="แก้ไขรายการ">
+                                <i class="ph ph-pencil-simple text-lg"></i>
+                            </button>
+                            <button @click="deleteTransaction(t.id)" class="ml-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400" title="ลบรายการ">
+                                <i class="ph ph-trash text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div v-if="selectedDay.transactions.length === 0" class="text-center py-8 text-gray-400">
+                        <i class="ph ph-smiley-blank text-4xl mb-2"></i>
+                        <p>ยังไม่มีรายการในวันนี้</p>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-gray-100 shrink-0 dark:border-gray-700">
+                     <button @click="openAddModalFromDay" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-bold shadow-lg shadow-indigo-200 dark:shadow-none">
+                        + เพิ่มรายการใหม่
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Invoice Preview -->
+        <div v-if="showInvoiceModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm print:bg-white print:p-0 print:absolute print:inset-0" @click.self="showInvoiceModal = false">
+            <div class="bg-white rounded-none md:rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl transform transition-all flex flex-col max-h-[95vh] print:max-h-none print:shadow-none print:w-full print:max-w-none dark:bg-gray-800">
+                
+                <!-- Invoice Header (Toolbar) - Hide when printing -->
+                <div class="bg-gray-800 px-6 py-4 flex justify-between items-center text-white shrink-0 print:hidden dark:bg-gray-900">
+                    <h3 class="font-bold text-lg">ตัวอย่างใบเสร็จ / ใบสำคัญ</h3>
+                    <div class="flex items-center gap-3">
+                        <div class="receipt-toolbar flex items-center gap-2 bg-gray-700 rounded-lg px-3 py-1.5 border border-gray-600">
+                            <i class="ph ph-file-text text-gray-300"></i>
+                            <select v-model="paperSizeSingle" class="bg-transparent border-none text-sm text-white font-medium focus:ring-0 outline-none cursor-pointer">
+                                <option value="small" class="text-gray-900">ขนาดเล็ก (80mm)</option>
+                                <option value="a4" class="text-gray-900">A4 แนวตั้ง</option>
+                                <option value="a4-landscape" class="text-gray-900">A4 แนวนอน</option>
+                            </select>
+                        </div>
+                        <button @click="downloadInvoiceAsPDF('single')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg font-bold transition text-white">
+                            <i class="ph ph-download-simple"></i> PDF
+                        </button>
+                        <button @click="showInvoiceModal = false" class="text-gray-400 hover:text-white">
+                            <i class="ph ph-x text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Invoice Paper -->
+                <div class="flex-1 overflow-hidden bg-gray-100 p-4 print:p-0 print:bg-white print:overflow-visible dark:bg-gray-900 receipt-container-wrapper relative flex items-center justify-center">
+                    <div id="receipt-scaler-single" :class="paperSizeSingle === 'small' ? 'receipt-paper-small' : (paperSizeSingle === 'a4-landscape' ? 'receipt-paper-a4-landscape' : 'receipt-paper-a4')" class="receipt-scaler bg-white p-8 shadow-sm mx-auto flex flex-col print:shadow-none origin-top">
+                        
+                        <!-- Header -->
+                        <div class="text-center mb-6 border-b-2 border-gray-800 pb-4">
+                            <h2 class="font-bold text-gray-800 mb-1">{{ shopProfile.name || 'ชื่อร้านค้าของคุณ' }}</h2>
+                            <p class="text-gray-500 header-info whitespace-pre-line leading-tight">{{ shopProfile.address || 'ที่อยู่ร้านค้า...' }}</p>
+                            <div class="flex justify-center gap-4 mt-1 header-info text-gray-500">
+                                <span v-if="shopProfile.phone">โทร: {{ shopProfile.phone }}</span>
+                                <span v-if="shopProfile.taxId">เลขภาษี: {{ shopProfile.taxId }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="flex justify-between items-start mb-8">
+                            <div>
+                                <p class="text-gray-500 text-sm">ลูกค้า / รายการ</p>
+                                <p class="font-bold text-lg text-gray-800">{{ selectedInvoiceTransaction.title }}</p>
+                                <p class="text-sm text-gray-500 mt-1">{{ selectedInvoiceTransaction.category }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-gray-500 text-sm">วันที่</p>
+                                <p class="font-bold text-gray-800">{{ formatDate(selectedInvoiceTransaction.date) }}</p>
+                                <div class="mt-2 inline-block px-3 py-1 rounded border text-xs font-bold uppercase tracking-wider" 
+                                    :class="selectedInvoiceTransaction.type === 'income' ? 'border-emerald-500 text-emerald-700' : 'border-red-500 text-red-700'">
+                                    {{ selectedInvoiceTransaction.type === 'income' ? 'ใบเสร็จรับเงิน' : 'ใบสำคัญจ่าย' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <table class="w-full mb-8">
+                            <thead>
+                                <tr class="border-b-2 border-gray-200">
+                                    <th class="text-left py-2 text-gray-600 font-bold w-3/4">รายการ</th>
+                                    <th class="text-right py-2 text-gray-600 font-bold">จำนวนเงิน</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 text-gray-800">{{ selectedInvoiceTransaction.title }} ({{ selectedInvoiceTransaction.category }})</td>
+                                    <td class="py-4 text-right font-bold text-gray-800">{{ formatCurrency(selectedInvoiceTransaction.amount) }}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td class="pt-4 text-right font-bold text-gray-800">ยอดสุทธิ</td>
+                                    <td class="pt-4 text-right font-bold text-xl" :class="(selectedInvoiceTransaction.type === 'expense' || selectedInvoiceTransaction.type === 'debt') ? 'text-red-600' : 'text-emerald-600'">{{ formatCurrency(selectedInvoiceTransaction.amount) }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- Payment Method -->
+                        <div class="mb-12 text-sm text-gray-500">
+                            <p>ชำระโดย: <span class="font-bold text-gray-700">{{ selectedInvoiceTransaction.method === 'cash' ? 'เงินสด' : 'โอนเงิน' }}</span></p>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="mt-auto grid grid-cols-2 gap-8 pt-8 header-info">
+                            <div class="text-center">
+                                <div class="border-b border-gray-300 w-32 mx-auto mb-2"></div>
+                                <p class="text-gray-400">ผู้รับเงิน</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="border-b border-gray-300 w-32 mx-auto mb-2"></div>
+                                <p class="text-gray-400">ผู้จ่ายเงิน</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Daily Invoice -->
+        <div v-if="showDailyInvoiceModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm print:bg-white print:p-0 print:absolute print:inset-0" @click.self="showDailyInvoiceModal = false">
+            <div class="bg-white rounded-none md:rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl transform transition-all flex flex-col max-h-[95vh] print:max-h-none print:shadow-none print:w-full print:max-w-none dark:bg-gray-800">
+                <div class="bg-gray-800 px-6 py-4 flex justify-between items-center text-white shrink-0 print:hidden dark:bg-gray-900">
+                    <h3 class="font-bold text-lg">ใบเสร็จรวมรายการประจำวัน</h3>
+                    <div class="flex items-center gap-3">
+                        <div class="receipt-toolbar flex items-center gap-2 bg-gray-700 rounded-lg px-3 py-1.5 border border-gray-600">
+                            <i class="ph ph-file-text text-gray-300"></i>
+                            <select v-model="paperSizeDaily" class="bg-transparent border-none text-sm text-white font-medium focus:ring-0 outline-none cursor-pointer">
+                                <option value="small" class="text-gray-900">ขนาดเล็ก (80mm)</option>
+                                <option value="a4" class="text-gray-900">A4 แนวตั้ง</option>
+                                <option value="a4-landscape" class="text-gray-900">A4 แนวนอน</option>
+                            </select>
+                        </div>
+                        <button @click="downloadInvoiceAsPDF('daily')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg font-bold transition text-white">
+                            <i class="ph ph-download-simple"></i> PDF
+                        </button>
+                        <button @click="showDailyInvoiceModal = false" class="text-gray-400 hover:text-white">
+                            <i class="ph ph-x text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-hidden bg-gray-100 p-4 print:p-0 print:bg-white print:overflow-visible dark:bg-gray-900 receipt-container-wrapper relative flex items-center justify-center">
+                    <div id="receipt-scaler-daily" :class="paperSizeDaily === 'small' ? 'receipt-paper-small' : (paperSizeDaily === 'a4-landscape' ? 'receipt-paper-a4-landscape' : 'receipt-paper-a4')" class="receipt-scaler bg-white p-8 shadow-sm mx-auto flex flex-col print:shadow-none origin-top">
+                        <div class="text-center mb-6 border-b-2 border-gray-800 pb-4">
+                            <h2 class="font-bold text-gray-800 mb-1">{{ shopProfile.name || 'ชื่อร้านค้าของคุณ' }}</h2>
+                            <p class="text-gray-500 header-info whitespace-pre-line leading-tight">{{ shopProfile.address || 'ที่อยู่ร้านค้า...' }}</p>
+                            <div class="flex justify-center gap-4 mt-1 header-info text-gray-500">
+                                <span v-if="shopProfile.phone">โทร: {{ shopProfile.phone }}</span>
+                                <span v-if="shopProfile.taxId">เลขภาษี: {{ shopProfile.taxId }}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-start mb-8">
+                            <div>
+                                <p class="text-gray-500 text-sm">วันที่</p>
+                                <p class="font-bold text-lg text-gray-800">{{ formatDate(dailyInvoice.date) }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-gray-500 text-sm">ยอดรวมสุทธิ</p>
+                                <p class="font-bold text-xl" :class="dailyInvoice.total < 0 ? 'text-red-600' : 'text-emerald-600'">{{ formatCurrency(dailyInvoice.total) }}</p>
+                            </div>
+                        </div>
+                        <table class="w-full mb-8">
+                            <thead>
+                                <tr class="border-b-2 border-gray-200">
+                                    <th class="text-left py-2 text-gray-600 font-bold w-1/2">รายการ</th>
+                                    <th class="text-left py-2 text-gray-600 font-bold">หมวดหมู่</th>
+                                    <th class="text-right py-2 text-gray-600 font-bold">จำนวนเงิน</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="t in dailyInvoice.transactions" :key="t.id" class="border-b border-gray-100">
+                                    <td class="py-3 text-gray-800">{{ t.title }}</td>
+                                    <td class="py-3 text-gray-600">{{ t.category }}</td>
+                                    <td class="py-3 text-right font-bold" :class="(t.type === 'expense' || t.type === 'debt') ? 'text-red-600' : 'text-emerald-600'">{{ formatCurrency((t.type === 'expense' || t.type === 'debt') ? -t.amount : t.amount) }}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td class="pt-4 text-right font-bold text-gray-800">ยอดสุทธิ</td>
+                                    <td class="pt-4 text-right font-bold text-xl" :class="dailyInvoice.total < 0 ? 'text-red-600' : 'text-emerald-600'">{{ formatCurrency(dailyInvoice.total) }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="text-[10px] text-gray-400 mt-auto text-center">
+                            ใบเสร็จนี้แสดงยอดรวมของรายการทั้งหมดประจำวัน
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+    <!-- PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script type="module" src="../js/app.js"></script>
+</body>
+</html>

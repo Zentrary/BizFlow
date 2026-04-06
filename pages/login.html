@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - BizFlow</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/config.js"></script>
+    
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <div id="app" class="h-screen overflow-hidden relative">
+        
+        <div  class="h-full flex items-center justify-center p-4">
+            <div class="absolute top-4 left-4">
+                <a href="../index.html" class="flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition dark:text-gray-400 dark:hover:text-indigo-400 hover:scale-105 transform duration-200">
+                    <i class="ph ph-arrow-left"></i> กลับหน้าหลัก
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden dark:bg-gray-800 transition-colors animate-slide-up">
+                <div class="bg-indigo-600 p-8 text-center text-white">
+                    <h1 class="text-2xl font-bold mb-1 animate-fade-in delay-100">BizFlow</h1>
+                    <p class="text-indigo-200 text-sm animate-fade-in delay-200">ระบบจัดการเงินร้านค้าครบวงจร</p>
+                </div>
+                
+                <div class="p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center dark:text-white">เข้าสู่ระบบ</h2>
+
+                    <form @submit.prevent="handleAuth" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">ชื่อผู้ใช้ หรือ อีเมล</label>
+                            <div class="relative">
+                                <i class="ph ph-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input v-model="authForm.loginId" type="text" class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="username หรือ email" required>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">รหัสผ่าน</label>
+                            <div class="relative">
+                                <i class="ph ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input v-model="authForm.password" type="password" class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="••••••" required>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" v-model="authForm.remember" class="w-4 h-4 text-indigo-600 rounded">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">จดจำฉัน</span>
+                            </label>
+                            <button type="button" @click="openForgotPassword" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">ลืมรหัสผ่าน?</button>
+                        </div>
+
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-bold shadow-lg shadow-indigo-200 transition dark:shadow-none mt-6 hover:scale-105 transform duration-200">
+                            เข้าสู่ระบบ
+                        </button>
+                    </form>
+
+                    <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+                        ยังไม่มีบัญชี? 
+                        <a href="register.html" class="text-indigo-600 font-bold hover:underline dark:text-indigo-400">สมัครสมาชิก</a>
+                    </p>
+                    
+                    <div class="mt-6 text-center">
+                        <button @click="toggleDarkMode" class="text-gray-400 hover:text-gray-600 text-sm flex items-center justify-center gap-1 mx-auto dark:hover:text-gray-200">
+                            <i class="ph" :class="isDarkMode ? 'ph-sun' : 'ph-moon'"></i>
+                            {{ isDarkMode ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showForgotModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm" @click.self="closeForgotPassword">
+            <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all dark:bg-gray-800">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center dark:bg-gray-900/50 dark:border-gray-700">
+                    <h3 class="font-bold text-lg text-gray-800 dark:text-white">ลืมรหัสผ่าน</h3>
+                    <button @click="closeForgotPassword" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="ph ph-x text-xl"></i>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">กรอกอีเมลที่สมัครไว้ ระบบจะตั้งรหัสผ่านชั่วคราวให้ (Mock)</p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">อีเมล</label>
+                        <div class="relative">
+                            <i class="ph ph-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input v-model="forgotEmail" type="email" class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="name@example.com" required>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 justify-end pt-2">
+                        <button type="button" @click="closeForgotPassword" class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 transition">
+                            ยกเลิก
+                        </button>
+                        <button type="button" @click="submitForgotPassword" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition">
+                            ตั้งรหัสผ่านชั่วคราว
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script type="module" src="../js/app.js"></script>
+</body>
+</html>
