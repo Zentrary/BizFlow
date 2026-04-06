@@ -15,19 +15,19 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
         try { localStorage.setItem(key, JSON.stringify(transactions.value)); } catch {}
     };
 
-    const allCategories = [
-        'ขายสินค้า', 'บริการ', 'ดอกเบี้ย',
-        'วัตถุดิบ', 'ค่าเช่า', 'ค่าน้ำ/ไฟ', 'เงินเดือน', 'การตลาด', 'ขนส่ง',
-        'ลูกหนี้การค้า', 'ยืมเงิน',
-        'เจ้าหนี้การค้า', 'เครดิต',
-        'อื่นๆ'
-    ];
+    const customCategoryKey = 'อื่นๆ';
+    const categorySets = {
+        income: ['เงินเดือน', 'ขายสินค้า', 'บริการ', 'โบนัส', 'ดอกเบี้ยรับ', 'เงินคืน', 'งานฟรีแลนซ์', customCategoryKey],
+        expense: ['ค่าข้าว', 'ค่าเช้า', 'ค่าเช่า', 'ค่าน้ำ', 'ค่าไฟ', 'ค่าเดินทาง', 'ค่าอินเทอร์เน็ต', 'ค่าโทรศัพท์', 'ค่ารักษาพยาบาล', 'การศึกษา', 'ช้อปปิ้ง', 'บันเทิง', 'ภาษี', customCategoryKey],
+        debt: ['ลูกหนี้การค้า', 'ยืมเงิน', 'ยืมให้เพื่อน/ครอบครัว', customCategoryKey],
+        payable: ['เจ้าหนี้การค้า', 'หนี้บัตรเครดิต', 'ผ่อนสินค้า', 'ยืมจากเพื่อน/ครอบครัว', customCategoryKey]
+    };
 
     const categories = {
-        income: allCategories,
-        expense: allCategories,
-        debt: allCategories,
-        payable: allCategories
+        income: [...categorySets.income],
+        expense: [...categorySets.expense],
+        debt: [...categorySets.debt],
+        payable: [...categorySets.payable]
     };
 
     const categoryIcons = {
@@ -59,15 +59,18 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
         payable: { label: 'เจ้าหนี้', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' }
     };
 
+    const defaultCategoryFor = (type) => (categories[type] && categories[type][0]) || customCategoryKey;
     const form = ref({
         type: 'income',
-        category: 'ขายสินค้า',
+        category: defaultCategoryFor('income'),
+        customCategory: '',
         amount: '',
         title: '',
         date: new Date().toISOString().split('T')[0],
         method: 'cash',
         slip: null
     });
+    const showCustomCategoryInput = computed(() => form.value.category === customCategoryKey);
 
     const amountInput = Vue.computed({
         get: () => {
@@ -166,7 +169,8 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
     const resetForm = () => {
         form.value = {
             type: 'income',
-            category: 'ขายสินค้า',
+            category: defaultCategoryFor('income'),
+            customCategory: '',
             amount: '',
             title: '',
             date: new Date().toISOString().split('T')[0],
@@ -183,13 +187,18 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
     const startEditTransaction = (transaction) => {
         if (!transaction) return;
         editingId.value = transaction.id;
+        const categoryForType = categories[transaction.type] || [];
+        const categoryValue = transaction.category || '';
+        const hasPresetCategory = categoryForType.includes(categoryValue);
+
         form.value = {
             type: transaction.type || 'income',
-            category: transaction.category || (categories[transaction.type] ? categories[transaction.type][0] : 'อื่นๆ'),
+            category: hasPresetCategory ? categoryValue : customCategoryKey,
+            customCategory: hasPresetCategory ? '' : categoryValue,
             amount: transaction.amount ?? '',
             title: transaction.title || '',
             date: transaction.date || new Date().toISOString().split('T')[0],
-            method: transaction.method === 'transfer' ? 'transfer' : 'cash',
+            method: 'cash',
             slip: transaction.slip ?? null
         };
         showDayDetailModal.value = false;
@@ -202,6 +211,18 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
             return;
         }
 
+        const normalizedCustomCategory = String(form.value.customCategory || '').trim();
+        if (form.value.category === customCategoryKey && !normalizedCustomCategory) {
+            showToast('กรุณาระบุหมวดหมู่อื่นๆ', 'error');
+            return;
+        }
+
+        const payload = {
+            ...form.value,
+            category: form.value.category === customCategoryKey ? normalizedCustomCategory : form.value.category,
+            method: 'cash'
+        };
+
         if (isEditing.value) {
             const index = transactions.value.findIndex(t => t.id === editingId.value);
             if (index !== -1) {
@@ -212,7 +233,7 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
                             method: 'PUT',
                             headers: csrf ? { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf } : { 'Content-Type': 'application/json' },
                             credentials: 'include',
-                            body: JSON.stringify({ ...transactions.value[index], ...form.value })
+                            body: JSON.stringify({ ...transactions.value[index], ...payload })
                         });
                         if (!res.ok) throw new Error();
                         const updated = await res.json();
@@ -223,7 +244,7 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
                         return;
                     }
                 } else {
-                    transactions.value[index] = { ...transactions.value[index], ...form.value, id: editingId.value };
+                    transactions.value[index] = { ...transactions.value[index], ...payload, id: editingId.value };
                     showToast('บันทึกการแก้ไขเรียบร้อยแล้ว', 'success');
                     persistLocal();
                 }
@@ -242,19 +263,19 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
                     method: 'POST',
                     headers: csrf ? { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf } : { 'Content-Type': 'application/json' },
                     credentials: 'include',
-                    body: JSON.stringify({ ...form.value, isPaid: 0 })
+                    body: JSON.stringify({ ...payload, isPaid: 0 })
                 });
                 if (!res.ok) throw new Error();
                 const created = await res.json();
                 transactions.value.unshift(created);
                 showToast('บันทึกรายการเรียบร้อยแล้ว', 'success');
             } catch {
-                transactions.value.unshift({ id: Date.now(), ...form.value });
+                transactions.value.unshift({ id: Date.now(), ...payload });
                 persistLocal();
                 showToast('ระบบฐานข้อมูลไม่พร้อม: บันทึกชั่วคราวในเครื่อง', 'warning');
             }
         } else {
-            transactions.value.unshift({ id: Date.now(), ...form.value });
+            transactions.value.unshift({ id: Date.now(), ...payload });
             showToast('บันทึกรายการเรียบร้อยแล้ว', 'success');
             persistLocal();
         }
@@ -264,6 +285,14 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
 
     watch(showAddModal, (open) => {
         if (!open) cancelEdit();
+    });
+
+    watch(() => form.value.type, (nextType) => {
+        const list = categories[nextType] || [];
+        if (!list.includes(form.value.category)) {
+            form.value.category = defaultCategoryFor(nextType);
+            form.value.customCategory = '';
+        }
     });
 
     watch(() => filters.value.type, () => {
@@ -394,13 +423,12 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
     };
 
     const exportFilteredToCSV = () => {
-        const header = ['Date', 'Title', 'Type', 'Category', 'Method', 'Amount'];
+        const header = ['Date', 'Title', 'Type', 'Category', 'Amount'];
         const rows = filteredTransactions.value.map(t => [
             t.date,
             (t.title || '').replaceAll('"', '""'),
             t.type,
             (t.category || '').replaceAll('"', '""'),
-            t.method,
             t.amount
         ]);
         const csv = [header, ...rows]
@@ -438,6 +466,8 @@ export function useTransactions(transactions, auth, updateCharts, showAddModal, 
         payableList,
         markAsPaid,
         amountInput,
-        getCategoryIcon
+        getCategoryIcon,
+        showCustomCategoryInput,
+        customCategoryKey
     };
 }
