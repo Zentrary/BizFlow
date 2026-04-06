@@ -166,7 +166,6 @@
                                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">วันที่</th>
                                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">รายการ</th>
                                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">ประเภท</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">ช่องทาง</th>
                                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-right dark:text-gray-400">จำนวนเงิน</th>
                                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-center dark:text-gray-400">หลักฐาน</th>
                                 </tr>
@@ -179,12 +178,6 @@
                                         <span :class="(transactionTypeLabels[t.type] && transactionTypeLabels[t.type].className) || 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'" class="px-2 py-1 rounded text-xs font-medium">
                                             {{ (transactionTypeLabels[t.type] && transactionTypeLabels[t.type].label) || t.type }}
                                         </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                        <div class="flex items-center gap-1">
-                                            <i :class="t.method === 'cash' ? 'ph-money' : 'ph-bank'" class="text-lg"></i>
-                                            {{ t.method === 'cash' ? 'เงินสด' : 'โอนเงิน' }}
-                                        </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm font-bold text-right" :class="t.type === 'income' || t.type === 'debt' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
                                         {{ t.type === 'income' || t.type === 'debt' ? '+' : '-' }}{{ formatCurrency(t.amount) }}
@@ -277,7 +270,11 @@
                             >
                                 {{ cat }}
                             </button>
-                        </div>
+                                            </div>
+
+                    <div class="mb-4" v-if="showCustomCategoryInput">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">หมวดหมู่อื่นๆ</label>
+                        <input v-model="form.customCategory" type="text" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="เช่น ค่ากาแฟ, ค่าเดินทางพิเศษ">
                     </div>
 
                     <!-- Amount -->
@@ -295,21 +292,6 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">วันที่</label>
                             <input v-model="form.date" type="date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        </div>
-                    </div>
-
-                    <!-- Method -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">ช่องทางการเงิน</label>
-                        <div class="flex gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer dark:text-gray-300">
-                                <input type="radio" v-model="form.method" value="cash" class="w-4 h-4 text-indigo-600">
-                                <span>เงินสด</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer dark:text-gray-300">
-                                <input type="radio" v-model="form.method" value="transfer" class="w-4 h-4 text-indigo-600">
-                                <span>โอนเงิน</span>
-                            </label>
                         </div>
                     </div>
 
@@ -358,7 +340,7 @@
                             </div>
                             <div>
                                 <p class="font-bold text-gray-800 text-sm dark:text-white">{{ t.title }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ t.category }} • {{ t.method === 'cash' ? 'เงินสด' : 'โอน' }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ t.category }}</p>
                             </div>
                         </div>
                         <span :class="t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'" class="font-bold text-sm shrink-0 w-24 text-right">
@@ -570,3 +552,4 @@
     <script type="module" src="../js/app.js"></script>
 </body>
 </html>
+
