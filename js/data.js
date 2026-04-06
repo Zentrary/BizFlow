@@ -68,9 +68,9 @@ export function useDataManagement(transactions, auth, shopProfile) {
     
     const exportToCSV = () => {
         let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Date,Title,Type,Method,Amount\n";
+        csvContent += "Date,Title,Type,Amount\n";
         transactions.value.forEach(t => {
-            csvContent += `${t.date},${t.title},${t.type},${t.method},${t.amount}\n`;
+            csvContent += `${t.date},${t.title},${t.type},${t.amount}\n`;
         });
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
