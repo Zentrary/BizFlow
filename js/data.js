@@ -2,6 +2,13 @@
 import { showConfirm, showToast } from './utils.js';
 
 export function useDataManagement(transactions, auth, shopProfile) {
+    const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) || 'http://localhost:3000';
+
+    const getCsrfToken = () => {
+        const m = document.cookie.match(/(?:^|; )csrf=([^;]+)/);
+        return m ? decodeURIComponent(m[1]) : '';
+    };
+
     const exportData = () => {
         const dataStr = JSON.stringify(transactions.value);
         const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -51,6 +58,22 @@ export function useDataManagement(transactions, auth, shopProfile) {
             danger: true
         });
         if (!ok) return;
+
+        if (auth?.isLoggedIn?.value && !auth?.isGuest?.value) {
+            try {
+                const csrf = getCsrfToken();
+                const res = await fetch(`${API_BASE_URL}/api/transactions`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: csrf ? { 'X-CSRF-Token': csrf } : {}
+                });
+                if (!res.ok && res.status !== 204) throw new Error('Failed to clear server data');
+            } catch (err) {
+                console.error(err);
+                showToast('ลบข้อมูลบนเซิร์ฟเวอร์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง', 'error');
+                return;
+            }
+        }
 
         transactions.value = [];
 
