@@ -393,6 +393,15 @@ app.delete(['/api/transactions/:id', '/transactions/:id'], authMiddleware, requi
     }
 });
 
+app.delete(['/api/transactions', '/transactions'], authMiddleware, requireCsrf, async (req, res) => {
+    try {
+        await Transaction.deleteMany({ userId: req.userId });
+        res.status(204).send();
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // Serve frontend statically for local development
 app.use(express.static(path.resolve(__dirname, '..')));
 
@@ -434,4 +443,3 @@ const start = async () => {
 if (process.env.VERCEL !== '1') {
     start();
 }
-
